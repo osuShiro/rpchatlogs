@@ -1,0 +1,4 @@
+*.sqlite3
+chatlogs/migrations
+*.txt
+rpchatlogs/__pycache__
