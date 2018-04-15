@@ -2,26 +2,26 @@ from django.db import models
 
 # Create your models here.
 
-MESSAGE_TYPE = ('g', 'general',
-                't', 'attack',
-                'b', 'ability',
-                'p', 'spell',
-                'k', 'skill',
-                'e', 'emote',
-                'd', 'desc',
-                'r', 'roll')
+MESSAGE_TYPE = (('g', 'general'),
+                ('t', 'attack'),
+                ('b', 'ability'),
+                ('p', 'spell'),
+                ('k', 'skill'),
+                ('e', 'emote'),
+                ('d', 'desc'),
+                ('r', 'roll'))
 
-class Game(models):
-    gm = models.CharField(max_length=128, blank=True, default='')
+class Game(models.Model):
+    gm = models.CharField(max_length=128, default='')
     system = models.CharField(max_length=256, blank=True, default='vanilla')
 
-class Session(models):
+class Session(models.Model):
     title = models.CharField(max_length=256, default='')
     date = models.DateTimeField(default=None)
 
     game = models.ForeignKey(Game)
 
-class Message(models):
+class Message(models.Model):
     owner = models.CharField(max_length=128, default='')
     timestamp = models.DateTimeField(default = None)
     text = models.TextField(default='')
