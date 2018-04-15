@@ -12,6 +12,7 @@ MESSAGE_TYPE = (('g', 'general'),
                 ('r', 'roll'))
 
 class Game(models.Model):
+    name = models.CharField(max_length=128, default='')
     gm = models.CharField(max_length=128, default='')
     system = models.CharField(max_length=256, blank=True, default='vanilla')
 

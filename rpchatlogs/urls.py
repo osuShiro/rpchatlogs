@@ -16,8 +16,12 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from chatlogs import views as chat_views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', chat_views.home)
+    url(r'^game-admin/new', chat_views.game_add),
+    url(r'^game-admin', chat_views.game_admin),
+    url(r'^login/$', auth_views.login, {'template_name': 'chatlogs/registration/login.html'}, name='login'),
+    url(r'^$', chat_views.home),
 ]
