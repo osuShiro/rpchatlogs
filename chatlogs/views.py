@@ -24,4 +24,4 @@ def game_add(request):
         gm = request.POST['gm'] if 'gm' in keys else ''
         system = request.POST['system'] if 'system' in keys else ''
         chat_models.Game(name=name, gm=gm, system=system).save()
-        return HttpResponse('game added')
+        return render(request, 'chatlogs/game-add-success.html', {'name': name})
