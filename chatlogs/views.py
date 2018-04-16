@@ -6,12 +6,13 @@ from chatlogs import models as chat_models
 # Create your views here.
 
 def home(request):
-    return render(request, 'chatlogs/home.html')
+    games = (chat_models.Game.objects.all())
+    return render(request, 'chatlogs/home.html', {'game_list': games})
 
 @login_required()
 def game_admin(request):
     games = (chat_models.Game.objects.all())
-    return render(request, 'chatlogs/game-admin.html', {'game_list':games})
+    return render(request, 'chatlogs/game-admin.html', {'game_list': games})
 
 @login_required()
 def game_add(request):

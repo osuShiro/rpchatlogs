@@ -5,12 +5,12 @@
     <title>Game list Administration</title>
 </head>
 <body>
-    <p><a href="new">Add game</a></p>
+    <p><a href="/game-admin/new">Add game</a></p>
     <p>All games:</p>
     {% if game_list %}
     <ul>
         {% for game in game_list %}
-        <a href="{{ game.name }}">{{ game.name }}</a></li>{% endfor %}
+        <li><a href="/game-admin/{{ game.name }}">{{ game.name }}</a></li>{% endfor %}
     </ul>
     {% else %}
         <p>No games !</p>
