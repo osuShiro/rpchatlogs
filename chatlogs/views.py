@@ -51,21 +51,23 @@ def game_delete(request, name):
         return HttpResponse(status=405)
 
 @login_required()
-def game_edit(request, name):
+def game_view(request, name, action):
     if not name:
         return HttpResponse(status=403)
     else:
         try:
             game = chat_models.Game.objects.get(name__iexact=name)
             if request.method=='GET':
-                return render(request, 'chatlogs/game-edit.html', {'game': game})
+                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action':action})
             elif request.method=='POST':
+                if action!='edit':
+                    return HttpResponse(status=403)
                 keys = request.POST.keys()
                 game.name = request.POST['name'] if 'name' in keys else game.name
                 game.gm = request.POST['gm'] if 'gm' in keys else game.gm
                 game.system = request.POST['system'] if 'system' in keys else game.system
                 game.save()
-                return render(request, 'chatlogs/game-edit.html', {'game': game})
+                return render(request, 'chatlogs/game-edit.html', {'game': game, 'action':action})
             else:
                 return HttpResponse(status=405)
         except ObjectDoesNotExist:

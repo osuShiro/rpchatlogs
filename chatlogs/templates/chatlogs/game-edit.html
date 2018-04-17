@@ -6,14 +6,22 @@
 </head>
 <body>
     {% if game %}
-    <form action="" method="post">
-        {% csrf_token %}
-        <p>Name: <input type="text" value="{{ game.name }}" name="name"></p>
-        <p>GM: <input type="text" value="{{ game.gm }}" name="gm"></p>
-        <p>System: <input type="text" value="{{ game.system }}" name="system"></p>
-        <input type="submit" value="edit">
-    </form>
-        <p>Session logs:</p>
+        {% if action == "edit" %}
+        <form action="" method="post">
+            {% csrf_token %}
+            <p>Name: <input type="text" value="{{ game.name }}" name="name"></p>
+            <p>GM: <input type="text" value="{{ game.gm }}" name="gm"></p>
+            <p>System: <input type="text" value="{{ game.system }}" name="system"></p>
+            <input type="submit" value="edit">
+        </form>
+            <p>Session logs:</p>
+        {% elif action == "view" %}
+            <p>Name: {{ game.name }}</p>
+            <p>GM: {{ game.gm }}</p>
+            <p>System: {{ game.system }}</p>
+        {% else %}
+        <p>What the fuck are you trying to do ?</p>
+        {% endif %}
     {% else %}
     <p>No game given?</p>
     {% endif %}
