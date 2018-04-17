@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game {{ game.name }} edition</title>
+</head>
+<body>
+    {% if game %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>Name: <input type="text" value="{{ game.name }}" name="name"></p>
+        <p>GM: <input type="text" value="{{ game.gm }}" name="gm"></p>
+        <p>System: <input type="text" value="{{ game.system }}" name="system"></p>
+        <input type="submit" value="edit">
+    </form>
+        <p>Session logs:</p>
+    {% else %}
+    <p>No game given?</p>
+    {% endif %}
+</body>
+</html>
