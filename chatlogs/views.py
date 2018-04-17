@@ -49,3 +49,15 @@ def game_delete(request, name):
             return render(request, 'chatlogs/game-admin.html', {'game_list': games})
     else:
         return HttpResponse(status=405)
+
+@login_required()
+def game_edit(request, name):
+    if not name:
+        return HttpResponse(status=403)
+    else:
+        try:
+            game = chat_models.Game.objects.get(name__iexact=name)
+            game.delete()
+        except ObjectDoesNotExist:
+            return HttpResponse('Game not found.', status=403)
+        return HttpResponse(name)

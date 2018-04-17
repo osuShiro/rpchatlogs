@@ -13,11 +13,12 @@
         <li>
             <form action="/game-admin/{{ game.name }}/delete/"
                   method="post"
-                  onclick="return confirm('Are you sure? This will also delete all associated chatlogs.')">
+                  onclick="return confirm('Are you sure? This will also delete all associated chatlogs.')"
+                  style="display: inline;">
                 {% csrf_token %}
                 <input type="submit" value="delete">
-                <a href="/game-admin/{{ game.name }}">{{ game.name }}</a>
             </form>
+                <a href="/game-admin/{{ game.name }}/">{{ game.name }}</a>
         </li>{% endfor %}
     </ul>
     {% else %}
