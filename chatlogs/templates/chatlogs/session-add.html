@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add new session for {{ game.name }}</title>
+</head>
+<body>
+    {% if status %}<p>{{ status }}</p>{% endif %}
+    <p>Add new session for {{ game.name }}</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        Session title: <input type="text" name="title"><br />
+        Date will be automatically added based on the chatlog file.<br />
+        <textarea rows="25" cols="100" name="chatlog"></textarea><br />
+        <input type="hidden" name="game_name" value="{{ game.name }}">
+        <input type="submit" value="create session">
+    </form>
+</body>
+</html>

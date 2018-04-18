@@ -18,7 +18,7 @@ class Game(models.Model):
 
 class Session(models.Model):
     title = models.CharField(max_length=256, default='')
-    date = models.DateTimeField(default=None)
+    date = models.DateTimeField(default=None, null=True)
 
     game = models.ForeignKey(Game)
 

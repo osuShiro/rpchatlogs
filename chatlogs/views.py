@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from chatlogs import models as chat_models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+import json
 
 # Create your views here.
 
@@ -57,17 +58,44 @@ def game_view(request, name, action):
     else:
         try:
             game = chat_models.Game.objects.get(name__iexact=name)
+            sessions = chat_models.Session.objects.filter(game=game)
             if request.method=='GET':
-                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action':action})
+                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': action, 'sessions': sessions})
             elif request.method=='POST':
-                if action!='edit':
+                if action == 'edit':
+                    keys = request.POST.keys()
+                    game.name = request.POST['name'] if 'name' in keys else game.name
+                    game.gm = request.POST['gm'] if 'gm' in keys else game.gm
+                    game.system = request.POST['system'] if 'system' in keys else game.system
+                    game.save()
+                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': action, 'sessions': sessions})
+                else:
                     return HttpResponse(status=403)
+            else:
+                return HttpResponse(status=405)
+        except ObjectDoesNotExist:
+            return HttpResponse('Game not found.', status=403)
+
+@login_required()
+def session_add(request, name):
+    if not name:
+        return HttpResponse(status=403)
+    else:
+        try:
+            game = chat_models.Game.objects.get(name__iexact=name)
+            if request.method == 'GET':
+                return render(request, 'chatlogs/session-add.html', {  'game': game})
+            elif request.method == 'POST':
                 keys = request.POST.keys()
-                game.name = request.POST['name'] if 'name' in keys else game.name
-                game.gm = request.POST['gm'] if 'gm' in keys else game.gm
-                game.system = request.POST['system'] if 'system' in keys else game.system
-                game.save()
-                return render(request, 'chatlogs/game-edit.html', {'game': game, 'action':action})
+                if 'title' not in keys:
+                    return HttpResponse('ERROR: title cannot be empty.', status=400)
+                if 'chatlog' in keys and request.POST['chatlog'] != '':
+                    try:
+                        chatlog = json.loads(request.POST['chatlog'])
+                    except:
+                        return HttpResponse('Invalid json in the chatlog.', status=400)
+                chat_models.Session(title=request.POST['title'], game=game).save()
+                return render(request, 'chatlogs/session-add.html', {'status': 'successfully added chatlog'})
             else:
                 return HttpResponse(status=405)
         except ObjectDoesNotExist:

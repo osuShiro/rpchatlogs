@@ -21,6 +21,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^game-admin/(?P<name>.+)/delete/$', chat_views.game_delete),
+    url(r'^game-admin/(?P<name>.+)/session/add/$', chat_views.session_add),
     url(r'^game-admin/(?P<name>.+)/$', chat_views.game_view, {'action':'edit'}),
     url(r'^game-admin/new', chat_views.game_add),
     url(r'^game-admin', chat_views.game_admin),
