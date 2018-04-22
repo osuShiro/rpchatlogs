@@ -3,9 +3,75 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from chatlogs import models as chat_models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-import json
+import json, datetime
 
 # Create your views here.
+
+def export_chat_to_session(chatlog, session):
+    for message in chatlog:
+        if message['type'] == 'action':
+            chat_models.General(
+                owner='',
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                text=message['text'],
+                message_type='e',
+                session=session
+                ).save()
+        elif message['type'] == 'description':
+            chat_models.General(
+                owner='',
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                text=message['text'],
+                message_type='d',
+                session=session
+                ).save()
+        elif message['type'] == 'roll':
+            chat_models.Roll(
+                owner=message['owner'],
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                message_type='r',
+                session=session,
+                formula=message['formula'],
+                rolls=json.dumps(message['rolls']),
+                result=message['result']
+            ).save()
+        elif message['type'] == 'skill roll':
+            chat_models.SkillRoll(
+                owner=message['owner'],
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                text=message['text'],
+                message_type='k',
+                session=session,
+                details=message['roll_detail'],
+                result=message['result'],
+                notes=message['notes']
+                ).save()
+        elif message['type'] == 'attack':
+            chat_models.Attack(
+                owner=message['owner'],
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                text=message['text'],
+                message_type='t',
+                session=session,
+                attacks=json.dumps(message['attacks']),
+                notes=message['notes']
+                ).save()
+        elif message['type'] == 'spell':
+            chat_models.General(
+                owner=message['owner'],
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                text=message['text'],
+                message_type='p',
+                session=session
+                ).save()
+        elif message['type'] == 'ability':
+            chat_models.General(
+                owner=message['owner'],
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                text=message['text'],
+                message_type='a',
+                session=session
+                ).save()
 
 def home(request):
     games = (chat_models.Game.objects.all())
@@ -84,17 +150,20 @@ def session_add(request, name):
         try:
             game = chat_models.Game.objects.get(name__iexact=name)
             if request.method == 'GET':
-                return render(request, 'chatlogs/session-add.html', {  'game': game})
+                return render(request, 'chatlogs/session-add.html', {'game': game})
             elif request.method == 'POST':
                 keys = request.POST.keys()
                 if 'title' not in keys:
                     return HttpResponse('ERROR: title cannot be empty.', status=400)
+                session = chat_models.Session(title=request.POST['title'], game=game)
+                session.save()
                 if 'chatlog' in keys and request.POST['chatlog'] != '':
                     try:
                         chatlog = json.loads(request.POST['chatlog'])
+                        export_chat_to_session(chatlog, session)
+                        session.save()
                     except:
                         return HttpResponse('Invalid json in the chatlog.', status=400)
-                chat_models.Session(title=request.POST['title'], game=game).save()
                 return render(request, 'chatlogs/session-add.html', {'status': 'successfully added chatlog'})
             else:
                 return HttpResponse(status=405)

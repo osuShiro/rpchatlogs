@@ -22,6 +22,9 @@ class Session(models.Model):
 
     game = models.ForeignKey(Game)
 
+    def __str__(self):
+        return self.game.name + ': ' + self.title
+
 class Message(models.Model):
     owner = models.CharField(max_length=128, default='')
     timestamp = models.DateTimeField(default = None)
@@ -39,6 +42,7 @@ class General(Message):
 class SkillRoll(General):
     details = models.TextField(default='')
     result = models.CharField(max_length=64, default='0')
+    notes = models.TextField(default='')
 
 class Attack(General):
     attacks = models.TextField(default='')
