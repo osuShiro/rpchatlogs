@@ -10,7 +10,7 @@ import json, datetime
 def export_chat_to_session(chatlog, session):
     for message in chatlog:
         if message['type'] == 'action':
-            chat_models.General(
+            chat_models.Message(
                 owner='',
                 timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
                 text=message['text'],
@@ -18,7 +18,7 @@ def export_chat_to_session(chatlog, session):
                 session=session
                 ).save()
         elif message['type'] == 'description':
-            chat_models.General(
+            chat_models.Message(
                 owner='',
                 timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
                 text=message['text'],
@@ -26,17 +26,17 @@ def export_chat_to_session(chatlog, session):
                 session=session
                 ).save()
         elif message['type'] == 'roll':
-            chat_models.Roll(
+            chat_models.Message(
                 owner=message['owner'],
                 timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
                 message_type='r',
                 session=session,
                 formula=message['formula'],
-                rolls=json.dumps(message['rolls']),
+                rolls=message['rolls'],
                 result=message['result']
             ).save()
         elif message['type'] == 'skill roll':
-            chat_models.SkillRoll(
+            chat_models.Message(
                 owner=message['owner'],
                 timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
                 text=message['text'],
@@ -47,7 +47,7 @@ def export_chat_to_session(chatlog, session):
                 notes=message['notes']
                 ).save()
         elif message['type'] == 'attack':
-            chat_models.Attack(
+            chat_models.Message(
                 owner=message['owner'],
                 timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
                 text=message['text'],
@@ -57,7 +57,7 @@ def export_chat_to_session(chatlog, session):
                 notes=message['notes']
                 ).save()
         elif message['type'] == 'spell':
-            chat_models.General(
+            chat_models.Message(
                 owner=message['owner'],
                 timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
                 text=message['text'],
@@ -65,13 +65,21 @@ def export_chat_to_session(chatlog, session):
                 session=session
                 ).save()
         elif message['type'] == 'ability':
-            chat_models.General(
+            chat_models.Message(
                 owner=message['owner'],
                 timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
                 text=message['text'],
                 message_type='a',
                 session=session
                 ).save()
+        else:
+            chat_models.Message(
+                owner=message['owner'],
+                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
+                text=message['text'],
+                message_type='g',
+                session=session
+            ).save()
 
 def home(request):
     games = (chat_models.Game.objects.all())
@@ -117,8 +125,7 @@ def game_delete(request, name):
     else:
         return HttpResponse(status=405)
 
-@login_required()
-def game_view(request, name, action):
+def game_view(request, name):
     if not name:
         return HttpResponse(status=403)
     else:
@@ -126,17 +133,28 @@ def game_view(request, name, action):
             game = chat_models.Game.objects.get(name__iexact=name)
             sessions = chat_models.Session.objects.filter(game=game)
             if request.method=='GET':
-                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': action, 'sessions': sessions})
+                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': 'view', 'sessions': sessions})
+            else:
+                return HttpResponse(status=405)
+        except ObjectDoesNotExist:
+            return HttpResponse('Game not found.', status=403)
+
+def game_edit(request, name):
+    if not name:
+        return HttpResponse(status=403)
+    else:
+        try:
+            game = chat_models.Game.objects.get(name__iexact=name)
+            sessions = chat_models.Session.objects.filter(game=game)
+            if request.method=='GET':
+                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': 'edit', 'sessions': sessions})
             elif request.method=='POST':
-                if action == 'edit':
-                    keys = request.POST.keys()
-                    game.name = request.POST['name'] if 'name' in keys else game.name
-                    game.gm = request.POST['gm'] if 'gm' in keys else game.gm
-                    game.system = request.POST['system'] if 'system' in keys else game.system
-                    game.save()
-                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': action, 'sessions': sessions})
-                else:
-                    return HttpResponse(status=403)
+                keys = request.POST.keys()
+                game.name = request.POST['name'] if 'name' in keys else game.name
+                game.gm = request.POST['gm'] if 'gm' in keys else game.gm
+                game.system = request.POST['system'] if 'system' in keys else game.system
+                game.save()
+                return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': 'edit', 'sessions': sessions})
             else:
                 return HttpResponse(status=405)
         except ObjectDoesNotExist:
@@ -169,3 +187,17 @@ def session_add(request, name):
                 return HttpResponse(status=405)
         except ObjectDoesNotExist:
             return HttpResponse('Game not found.', status=403)
+
+def session_view(request, name, session_name):
+    if not name:
+        return HttpResponse('Game not found.', status=403)
+    if not session_name:
+        return HttpResponse('Session does not exist.', status=403)
+    else:
+        try:
+            game = chat_models.Game.objects.get(name__iexact=name)
+            session = chat_models.Session.objects.get(title__iexact=session_name, game=game)
+            messages = chat_models.Message.objects.filter(session=session)
+            return render(request, 'chatlogs/session_view.html', {'game': game, 'session': session, 'messages': messages})
+        except:
+            return HttpResponse('Game or session not found.', status=403)

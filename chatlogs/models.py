@@ -30,25 +30,11 @@ class Message(models.Model):
     timestamp = models.DateTimeField(default = None)
     text = models.TextField(default='')
     message_type = models.CharField(max_length=1, choices=MESSAGE_TYPE)
-
-    session = models.ForeignKey(Session)
-
-    class Meta:
-        abstract = True
-
-class General(Message):
-    pass
-
-class SkillRoll(General):
     details = models.TextField(default='')
-    result = models.CharField(max_length=64, default='0')
-    notes = models.TextField(default='')
-
-class Attack(General):
-    attacks = models.TextField(default='')
-    notes = models.TextField(default='')
-
-class Roll(Message):
     formula = models.TextField(default='')
     rolls = models.TextField(default='')
     result = models.CharField(max_length=64, default='0')
+    notes = models.TextField(default='')
+    attacks = models.TextField(default='')
+
+    session = models.ForeignKey(Session)

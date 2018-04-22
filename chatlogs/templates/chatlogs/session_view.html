@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ session.title }} for {{ game.name }}</title>
+    <link rel="stylesheet" type="text/css" href="/static/chatlog.css">
+</head>
+<body>
+    <p><a href="/{{ game.name }}/">Return to game page</a></p>
+    {% if messages %}
+    <div class="chatlog">
+        {% for message in messages %}
+            {% if message.message_type == "e" %}
+                <div class="emote">
+                    {{ message.text }}
+                </div>
+            {% elif message.message_type == "d" %}
+                <div class="desc">
+                    {{ message.text }}
+                </div>
+            {% else %}
+            <div class="message">
+                {{ message.owner }}
+                {% if message.message_type == "r" %}
+                    <div class="roll">
+                        {{ message.formula }}: <span class="result">{{ message.result }}</span> ({{ message.rolls }})
+                    </div>
+                {% elif message.message_type == "k" %}
+                    <div class="skill">
+                        {{ message.text }}: <span class="result">{{ message.result }}</span> ({{ message.details }})
+                    </div>
+                {% elif message.message_type == "t" %}
+                    <div class="attack">
+                        <span class="attack-title">
+                            {{ message.text }}
+                        </span>
+                        <!-- TO DO: DISPLAY ALL ATTACKS AND STUFF -->
+                    </div>
+                {% elif message.message_type == "p" %}
+                    <div class="skill">
+                        {{ message.text }}
+                    </div>
+                {% elif message.message_type == "b" %}
+                    <div class="skill">
+                        {{ message.text }}
+                    </div>
+                {% elif message.message_type == "g" %}
+                {{ message.text }}
+                {% endif %}
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No chatlog for this session.</p>
+    {% endif %}
+</body>
+</html>
