@@ -198,6 +198,9 @@ def session_view(request, name, session_name):
             game = chat_models.Game.objects.get(name__iexact=name)
             session = chat_models.Session.objects.get(title__iexact=session_name, game=game)
             messages = chat_models.Message.objects.filter(session=session)
+            for message in messages:
+                if message.message_type == 't':
+                    message.attacks = json.loads(message.attacks)
             return render(request, 'chatlogs/session_view.html', {'game': game, 'session': session, 'messages': messages})
         except:
             return HttpResponse('Game or session not found.', status=403)

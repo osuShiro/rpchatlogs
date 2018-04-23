@@ -4,7 +4,7 @@
     -webkit-user-select: none;
     padding:4px;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
-    font_size:12px;
+    font_size:14px;
 }
 
 .desc
@@ -70,4 +70,25 @@
     padding: 2px;
     border: 1px solid black;
     margin: 4px;
+}
+
+.attack-title
+{
+    font-weight:bold;
+    background-color: black;
+    padding:2px;
+    color: white;
+}
+
+.attack li
+{
+    margin: 8px 2px 4px 8px;
+    list-style-type: none;
+}
+
+.details
+{
+    -webkit-text-size-adjust: 80%;
+    color:grey;
+    font-size:12px;
 }

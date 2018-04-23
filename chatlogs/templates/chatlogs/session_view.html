@@ -27,14 +27,20 @@
                     </div>
                 {% elif message.message_type == "k" %}
                     <div class="skill">
-                        {{ message.text }}: <span class="result">{{ message.result }}</span> ({{ message.details }})
+                        {{ message.text }}: <span class="result">{{ message.result }}</span>
+                        <span class="details">({{ message.details }})</div>
                     </div>
                 {% elif message.message_type == "t" %}
                     <div class="attack">
                         <span class="attack-title">
                             {{ message.text }}
-                        </span>
+                        </span><br />
                         <!-- TO DO: DISPLAY ALL ATTACKS AND STUFF -->
+                        {% for attack in message.attacks %}
+                        <li>{{ attack.name }}: <span class="result">{{ attack.result }}</span>
+                            <span class="details">({{ attack.roll_detail }})</span>
+                        </li>
+                        {% endfor %}
                     </div>
                 {% elif message.message_type == "p" %}
                     <div class="skill">
