@@ -160,6 +160,7 @@ def game_edit(request, name):
         except ObjectDoesNotExist:
             return HttpResponse('Game not found.', status=403)
 
+
 @login_required()
 def session_add(request, name):
     if not name:
@@ -188,6 +189,7 @@ def session_add(request, name):
         except ObjectDoesNotExist:
             return HttpResponse('Game not found.', status=403)
 
+
 def session_view(request, name, session_name):
     if not name:
         return HttpResponse('Game not found.', status=403)
@@ -201,6 +203,67 @@ def session_view(request, name, session_name):
             for message in messages:
                 if message.message_type == 't':
                     message.attacks = json.loads(message.attacks)
-            return render(request, 'chatlogs/session_view.html', {'game': game, 'session': session, 'messages': messages})
+            return render(request, 'chatlogs/session-view.html', {'game': game, 'session': session, 'messages': messages})
+        except:
+            return HttpResponse('Game or session not found.', status=403)
+
+@login_required()
+def session_edit(request, name, session_name):
+    if not name:
+        return HttpResponse('Game not found.', status=403)
+    if not session_name:
+        return HttpResponse('Session does not exist.', status=403)
+    else:
+        try:
+            game = chat_models.Game.objects.get(name__iexact=name)
+            session = chat_models.Session.objects.get(title__iexact=session_name, game=game)
+            messages = chat_models.Message.objects.filter(session=session)
+            for message in messages:
+                if message.message_type == 't':
+                    message.attacks = json.loads(message.attacks)
+            if request.method == 'GET':
+                return render(request, 'chatlogs/session-edit.html',
+                          {'game': game, 'session': session, 'messages': messages})
+            elif request.method == 'POST':
+                keys = request.POST.keys()
+                print(keys)
+                if 'delete' in keys:
+                    try:
+                        message = chat_models.Message.objects.get(id=request.POST['message_id'])
+                        message.delete()
+                        return render(request, 'chatlogs/session-edit.html',
+                                      {'game': game, 'session': session, 'messages': messages})
+                    except:
+                        return HttpResponse('Could not delete message.', status=400)
+                else:
+                    return HttpResponse('No message selected.', status=400)
+            else:
+                return HttpResponse(status=405)
+        except:
+            return HttpResponse('Game or session not found.', status=403)
+
+@login_required()
+def session_append(request, name, session_name):
+    print(session_name)
+    if not name:
+        return HttpResponse('Game not found.', status=403)
+    if not session_name:
+        return HttpResponse('Session does not exist.', status=403)
+    else:
+        try:
+            game = chat_models.Game.objects.get(name__iexact=name)
+            session = chat_models.Session.objects.get(title__iexact=session_name, game=game)
+            if request.method=='GET':
+                return render(request, 'chatlogs/session-append.html', {'session': session})
+            elif request.method=='POST':
+                try:
+                    chatlog = json.loads(request.POST['chatlog'])
+                    export_chat_to_session(chatlog, session)
+                    session.save()
+                except:
+                    return HttpResponse('Invalid json in the chatlog.', status=400)
+                return render(request, 'chatlogs/session-append.html', {'session': session})
+            else:
+                return HttpResponse(status=405)
         except:
             return HttpResponse('Game or session not found.', status=403)

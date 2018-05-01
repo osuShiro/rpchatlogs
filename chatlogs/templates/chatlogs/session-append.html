@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add new messages for {{ session.title }}</title>
+</head>
+<body>
+    {% if status %}<p>{{ status }}</p>{% endif %}
+    <p>Add new messages for {{ session.title }}</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <textarea rows="25" cols="100" name="chatlog"></textarea><br />
+        <input type="hidden" name="session_title" value="{{ session.title }}">
+        <input type="submit" value="add messages">
+    </form>
+</body>
+</html>

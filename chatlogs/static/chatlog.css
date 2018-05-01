@@ -5,6 +5,7 @@
     padding:4px;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
     font_size:14px;
+    width:100%;
 }
 
 .desc
@@ -91,4 +92,15 @@
     -webkit-text-size-adjust: 80%;
     color:grey;
     font-size:12px;
+}
+
+td
+{
+    padding: 0px;
+    margin: 0px;
+}
+
+.edit-buttons
+{
+    width:20px;
 }
