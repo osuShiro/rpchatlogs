@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from chatlogs import models as chat_models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-import json, datetime
+import json, datetime, re
 
 # Create your views here.
 
@@ -226,20 +226,56 @@ def session_edit(request, name, session_name):
                           {'game': game, 'session': session, 'messages': messages})
             elif request.method == 'POST':
                 keys = request.POST.keys()
-                print(keys)
-                if 'delete' in keys:
-                    try:
-                        message = chat_models.Message.objects.get(id=request.POST['message_id'])
-                        message.delete()
-                        return render(request, 'chatlogs/session-edit.html',
-                                      {'game': game, 'session': session, 'messages': messages})
-                    except:
-                        return HttpResponse('Could not delete message.', status=400)
+                if 'action' not in keys:
+                    return HttpResponse('No action selected', status=403)
                 else:
-                    return HttpResponse('No message selected.', status=400)
+                    # get message ids from checkbox keys
+                    messages_selected = []
+                    for key in keys:
+                        message_id = re.search(r'message-(\d+)', key)
+                        if message_id:
+                            messages_selected.append(message_id.group(1))
+                    if not messages_selected:
+                        return HttpResponse('No messages selected.', status=403)
+                    # delete exactly the selected messages
+                    if request.POST['action'] == 'delete_selected':
+                        try:
+                            for message_id in messages_selected:
+                                chat_models.Message.objects.get(id__iexact=message_id).delete()
+                                return render(request, 'chatlogs/session-edit.html',
+                                              {'game': game, 'session': session, 'messages': messages})
+                        except:
+                            return HttpResponse('Error deleting message.', status=403)
+                        messages = chat_models.Message.objects.filter(session=session)
+                    # delete all messages for this session before the first selected message
+                    elif request.POST['action'] == 'delete_before':
+                        try:
+                            to_delete = chat_models.Message.objects.filter(session=session, id__lte=messages_selected[0])
+                            for msg in to_delete:
+                                msg.delete()
+                            # map(lambda msg: msg.delete(), to_delete)
+                            messages = chat_models.Message.objects.filter(session=session)
+                            return render(request, 'chatlogs/session-edit.html',
+                                          {'game': game, 'session': session, 'messages': messages})
+                        except:
+                            return HttpResponse('Error deleting message.', status=403)
+                    # delete all messages for this session after the last selected message
+                    elif request.POST['action'] == 'delete_after':
+                        try:
+                            to_delete = chat_models.Message.objects.filter(session=session, id__gte=messages_selected[-1])
+                            for msg in to_delete:
+                                msg.delete()
+                            messages = chat_models.Message.objects.filter(session=session)
+                            return render(request, 'chatlogs/session-edit.html',
+                                          {'game': game, 'session': session, 'messages': messages})
+                        except:
+                            return HttpResponse('Error deleting message.', status=403)
+                    else:
+                        return HttpResponse(status=403)
             else:
                 return HttpResponse(status=405)
         except:
+            raise
             return HttpResponse('Game or session not found.', status=403)
 
 @login_required()
