@@ -20,7 +20,7 @@
                 </div>
             {% else %}
             <div class="message">
-                {{ message.owner }}
+                <strong>{{ message.owner }}:</strong>
                 {% if message.message_type == "r" %}
                     <div class="roll">
                         {{ message.formula }}: <span class="result">{{ message.result }}</span> ({{ message.rolls }})

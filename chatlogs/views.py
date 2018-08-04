@@ -7,80 +7,6 @@ import json, datetime, re
 
 # Create your views here.
 
-def export_chat_to_session(chatlog, session):
-    for message in chatlog:
-        if message['type'] == 'action':
-            chat_models.Message(
-                owner='',
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                text=message['text'],
-                message_type='e',
-                session=session
-                ).save()
-        elif message['type'] == 'description':
-            chat_models.Message(
-                owner='',
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                text=message['text'],
-                message_type='d',
-                session=session
-                ).save()
-        elif message['type'] == 'roll':
-            chat_models.Message(
-                owner=message['owner'],
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                message_type='r',
-                session=session,
-                formula=message['formula'],
-                rolls=message['rolls'],
-                result=message['result']
-            ).save()
-        elif message['type'] == 'skill roll':
-            chat_models.Message(
-                owner=message['owner'],
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                text=message['text'],
-                message_type='k',
-                session=session,
-                details=message['roll_detail'],
-                result=message['result'],
-                notes=message['notes']
-                ).save()
-        elif message['type'] == 'attack':
-            chat_models.Message(
-                owner=message['owner'],
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                text=message['text'],
-                message_type='t',
-                session=session,
-                attacks=json.dumps(message['attacks']),
-                notes=message['notes']
-                ).save()
-        elif message['type'] == 'spell':
-            chat_models.Message(
-                owner=message['owner'],
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                text=message['text'],
-                message_type='p',
-                session=session
-                ).save()
-        elif message['type'] == 'ability':
-            chat_models.Message(
-                owner=message['owner'],
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                text=message['text'],
-                message_type='a',
-                session=session
-                ).save()
-        else:
-            chat_models.Message(
-                owner=message['owner'],
-                timestamp=datetime.datetime.strptime(message['timestamp'], '%B %d, %Y %I:%M%p'),
-                text=message['text'],
-                message_type='g',
-                session=session
-            ).save()
-
 def home(request):
     games = (chat_models.Game.objects.all())
     return render(request, 'chatlogs/home.html', {'game_list': games})
@@ -179,9 +105,10 @@ def session_add(request, name):
                 if 'chatlog' in keys and request.POST['chatlog'] != '':
                     try:
                         chatlog = json.loads(request.POST['chatlog'])
-                        export_chat_to_session(chatlog, session)
+                        session.import_chatlog(chatlog)
                         session.save()
                     except:
+                        raise
                         return HttpResponse('Invalid json in the chatlog.', status=400)
                 return render(request, 'chatlogs/session-add.html', {'status': 'successfully added chatlog'})
             else:
@@ -275,7 +202,6 @@ def session_edit(request, name, session_name):
             else:
                 return HttpResponse(status=405)
         except:
-            raise
             return HttpResponse('Game or session not found.', status=403)
 
 @login_required()
@@ -294,7 +220,7 @@ def session_append(request, name, session_name):
             elif request.method=='POST':
                 try:
                     chatlog = json.loads(request.POST['chatlog'])
-                    export_chat_to_session(chatlog, session)
+                    session.import_chatlog(chatlog)
                     session.save()
                 except:
                     return HttpResponse('Invalid json in the chatlog.', status=400)
