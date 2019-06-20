@@ -4,13 +4,15 @@ import datetime, json
 # Create your models here.
 
 MESSAGE_TYPE = (('g', 'general'),
+                ('d', 'description'),
                 ('t', 'attack'),
                 ('b', 'ability'),
                 ('p', 'spell'),
                 ('k', 'skill'),
                 ('e', 'emote'),
                 ('d', 'desc'),
-                ('r', 'roll')
+                ('r', 'roll'),
+                ('f', 'defence')
                 )
 
 def message_type_to_db(message):
@@ -63,6 +65,10 @@ class Session(models.Model):
                 new_message.message_type = 'p'
             elif message['type'] == 'ability':
                 new_message.message_type = 'a'
+            elif message['type'] == 'defence':
+                new_message.message_type = 'f'
+                new_message.details = message['roll_detail']
+                new_message.result = message['result']
             else:
                 new_message.message_type = 'g'
             new_message.save()

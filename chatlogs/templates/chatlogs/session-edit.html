@@ -6,18 +6,24 @@
     <link rel="stylesheet" type="text/css" href="/static/chatlog.css">
 </head>
 <body>
-    <p><a href="/game-admin/{{ game.name }}/">Return to game page</a></p>
-    <p><a href="/game-admin/{{ game.name }}/session/{{ session.title }}/append/">Add new messages to this session</a></p>
+    <div class="admin_actions">
+        <p><a href="/game-admin/{{ game.name }}/">Return to game page</a></p>
+        <p><a href="/game-admin/{{ game.name }}/session/{{ session.title }}/append/">Add new messages to this session</a></p>
+    </div>
     {% if messages %}
     <table class="chatlog">
         <form action="" method="post">
             {% csrf_token %}
-            <select name="action">
-                <option value="delete_before">delete messages before selected</option>
-                <option value="delete_after">delete messages after selected</option>
-                <option value="delete_selected" selected>delete selected messages</option>
-            </select>
-            <input type="submit" value="apply">
+            <span class="admin_actions form">
+                <select name="action">
+                    <option value="delete_before">delete messages before selected</option>
+                    <option value="delete_after">delete messages after selected</option>
+                    <option value="delete_selected" selected>delete selected messages</option>
+                </select>
+                <input type="submit" value="apply">
+                </span>
+            <div class="spacer">
+            </div>
             {% for message in messages %}
             <tr style="padding: 0px; margin: 0px">
                     <td class="edit-buttons">
@@ -62,6 +68,11 @@
                             {% elif message.message_type == "b" %}
                                 <div class="skill">
                                     {{ message.text }}
+                                </div>
+                            {% elif message.message_type == 'f' %}
+                                <div class="skill">
+                                    {{ message.text }}: <span class="result">{{ message.result }}</span>
+                                    <span class="details">({{ message.details }})</span>
                                 </div>
                             {% elif message.message_type == "g" %}
                             {{ message.text }}

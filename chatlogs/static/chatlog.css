@@ -104,3 +104,31 @@ td
 {
     width:20px;
 }
+
+.admin_actions
+{
+    position:fixed;
+    z-index:100;
+    background:white;
+    width:100%
+}
+
+.admin_actions div
+{
+    height: 350px;
+}
+
+span.admin_actions
+{
+    height:40px;
+    margin: 80px 0px 12px 0px;
+    padding-top:10px;
+    z-index:90;
+}
+
+div.spacer
+{
+    background:white;
+    height:130px;
+    border-bottom: 2px solid black;
+}

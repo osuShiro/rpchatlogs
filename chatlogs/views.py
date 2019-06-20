@@ -167,10 +167,13 @@ def session_edit(request, name, session_name):
                     # delete exactly the selected messages
                     if request.POST['action'] == 'delete_selected':
                         try:
+                            print(messages_selected)
                             for message_id in messages_selected:
+                                print('deleted %s' %message_id)
                                 chat_models.Message.objects.get(id__iexact=message_id).delete()
-                                return render(request, 'chatlogs/session-edit.html',
-                                              {'game': game, 'session': session, 'messages': messages})
+                            return render(request,
+                                          'chatlogs/session-edit.html',
+                                          {'game': game, 'session': session, 'messages': messages})
                         except:
                             return HttpResponse('Error deleting message.', status=403)
                         messages = chat_models.Message.objects.filter(session=session)

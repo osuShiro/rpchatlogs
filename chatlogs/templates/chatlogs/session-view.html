@@ -20,7 +20,7 @@
                 </div>
             {% else %}
             <div class="message">
-                <strong>{{ message.owner }}:</strong>
+                <strong>{{ message.owner }}</strong>
                 {% if message.message_type == "r" %}
                     <div class="roll">
                         {{ message.formula }}: <span class="result">{{ message.result }}</span> ({{ message.rolls }})
@@ -49,6 +49,12 @@
                 {% elif message.message_type == "b" %}
                     <div class="skill">
                         {{ message.text }}
+                    </div>
+                {% elif message.message_type == 'f' %}
+                    defence roll
+                    <div class="skill">
+                        {{ message.text }}: <span class="result">{{ message.result }}</span>
+                        <span class="details">({{ attack.details }})</span>
                     </div>
                 {% elif message.message_type == "g" %}
                 {{ message.text }}
