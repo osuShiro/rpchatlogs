@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="469a3f94-256f-4fc4-845d-ac7673b71458" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/chatlogs/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/chatlogs/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chatlogs/static/chatlog.css" beforeDir="false" afterPath="$PROJECT_DIR$/chatlogs/static/chatlog.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chatlogs/templates/chatlogs/session-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/chatlogs/templates/chatlogs/session-edit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chatlogs/templates/chatlogs/session-view.html" beforeDir="false" afterPath="$PROJECT_DIR$/chatlogs/templates/chatlogs/session-view.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chatlogs/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/chatlogs/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -52,8 +48,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/chatlogs/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="171" column="52" lean-forward="true" selection-start-line="171" selection-start-column="52" selection-end-line="171" selection-end-column="52" />
+            <state relative-caret-position="495">
+              <caret line="171" column="90" selection-start-line="171" selection-start-column="90" selection-end-line="171" selection-end-column="90" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -197,8 +193,9 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../KitsuneOdori" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../KitsuneOdori" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -341,13 +338,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/rpchatlogs/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="29" column="36" selection-start-line="29" selection-start-column="36" selection-end-line="29" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/chatlogs/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="525">
@@ -392,10 +382,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/rpchatlogs/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="29" column="36" selection-start-line="29" selection-start-column="36" selection-end-line="29" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/chatlogs/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="171" column="52" lean-forward="true" selection-start-line="171" selection-start-column="52" selection-end-line="171" selection-end-column="52" />
+        <state relative-caret-position="495">
+          <caret line="171" column="90" selection-start-line="171" selection-start-column="90" selection-end-line="171" selection-end-column="90" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
