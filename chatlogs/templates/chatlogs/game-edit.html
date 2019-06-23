@@ -23,9 +23,11 @@
         {% endif %}
         <p>Session logs {% if action == "edit" %}(<a href="session/add/">create new session</a>){% endif %}</p>
         {% if sessions %}
-            {% for session in sessions %}
-                <li><a href="session/{{ session.title }}/">{{ session.title }}</a></li>
-            {% endfor %}
+            <ol type="1">
+                {% for session in sessions %}
+                    <li><a href="session/{{ session.title }}/">{{ session.title }}</a></li>
+                {% endfor %}
+            </ol>
         {% else %}
             <p>No sessions yet.</p>
         {% endif %}
