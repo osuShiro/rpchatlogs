@@ -55,6 +55,7 @@
                                     <span class="attack-title">
                                         {{ message.text }}
                                     </span><br />
+                                    <!-- TO DO: DISPLAY ALL ATTACKS AND STUFF -->
                                     {% for attack in message.attacks %}
                                     <li>{{ attack.name }}: <span class="result">{{ attack.result }}</span>
                                         <span class="details">({{ attack.roll_detail }})</span>

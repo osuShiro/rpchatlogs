@@ -27,7 +27,8 @@ with open('key.txt','r') as key:
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1',
-                 'chatlogs.shiro.moe']
+                 'chatlogs.shiro.moe',
+                 '192.168.1.12']
 
 
 # Application definition
