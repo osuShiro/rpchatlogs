@@ -203,6 +203,7 @@ def session_edit(request, name, session_name):
             else:
                 return HttpResponse(status=405)
         except:
+            raise
             return HttpResponse('Game or session not found.', status=403)
 
 @login_required()
