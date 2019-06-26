@@ -6,6 +6,14 @@
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
     font_size:14px;
     width:100%;
+    word-wrap:break-word;
+}
+
+table
+{
+    padding: 0px;
+    margin: 0px;
+    table-layout:fixed;
 }
 
 .desc
@@ -46,7 +54,6 @@
     border-width: 2px 0px 0px 0px;
     border-color:lightgrey;
     background-color: rgb(240,240,240);
-    overflow:hidden;
 }
 
 .skill
@@ -92,12 +99,6 @@
     -webkit-text-size-adjust: 80%;
     color:grey;
     font-size:12px;
-}
-
-td
-{
-    padding: 0px;
-    margin: 0px;
 }
 
 .edit-buttons
