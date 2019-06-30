@@ -1,23 +1,26 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from chatlogs import models as chat_models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import json, datetime, re
 
 # Create your views here.
 
+
 def home(request):
     games = (chat_models.Game.objects.all())
     return render(request, 'chatlogs/home.html', {'game_list': games})
 
-@login_required()
 def game_admin(request):
+    if not request.user.is_superuser:
+        return HttpResponse(status=401)
     games = (chat_models.Game.objects.all())
     return render(request, 'chatlogs/game-admin.html', {'game_list': games})
 
-@login_required()
 def game_add(request):
+    if not request.user.is_superuser:
+        return HttpResponse(status=401)
     if request.method=='GET':
         return render(request, 'chatlogs/game-add.html')
     elif request.method=='POST':
@@ -33,8 +36,9 @@ def game_add(request):
     else:
         return HttpResponse(status=405)
 
-@login_required()
 def game_delete(request, name):
+    if not request.user.is_superuser:
+        return HttpResponse(status=401)
     if request.method=='POST':
         if not name:
             return HttpResponse(status=403)
@@ -66,6 +70,8 @@ def game_view(request, name):
             return HttpResponse('Game not found.', status=403)
 
 def game_edit(request, name):
+    if not request.user.is_superuser:
+        return HttpResponse(status=401)
     if not name:
         return HttpResponse(status=403)
     else:
@@ -87,8 +93,9 @@ def game_edit(request, name):
             return HttpResponse('Game not found.', status=403)
 
 
-@login_required()
 def session_add(request, name):
+    if not request.user.is_superuser:
+        return HttpResponse(status=401)
     if not name:
         return HttpResponse(status=403)
     else:
@@ -108,7 +115,6 @@ def session_add(request, name):
                         session.import_chatlog(chatlog)
                         session.save()
                     except:
-                        raise
                         return HttpResponse('Invalid json in the chatlog.', status=400)
                 return render(request, 'chatlogs/session-add.html', {'status': 'successfully added chatlog'})
             else:
@@ -134,8 +140,9 @@ def session_view(request, name, session_name):
         except:
             return HttpResponse('Game or session not found.', status=403)
 
-@login_required()
 def session_edit(request, name, session_name):
+    if not request.user.is_superuser:
+        return HttpResponse(status=401)
     if not name:
         return HttpResponse('Game not found.', status=403)
     if not session_name:
@@ -206,9 +213,9 @@ def session_edit(request, name, session_name):
             raise
             return HttpResponse('Game or session not found.', status=403)
 
-@login_required()
 def session_append(request, name, session_name):
-    print(session_name)
+    if not request.user.is_superuser:
+        return HttpResponse(status=401)
     if not name:
         return HttpResponse('Game not found.', status=403)
     if not session_name:

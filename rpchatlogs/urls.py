@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^game-admin/(?P<name>.+)/$', chat_views.game_edit,),
     url(r'^game-admin/new', chat_views.game_add),
     url(r'^game-admin', chat_views.game_admin),
-    url(r'^(?P<name>.+)/session/(?P<session_name>.+)/$', chat_views.session_view),
-    url(r'^(?P<name>.+)/$', chat_views.game_view),
-    url(r'^$', chat_views.home),
+    url(r'^game/(?P<name>.+)/session/(?P<session_name>.+)/$', chat_views.session_view),
+    url(r'^game/(?P<name>.+)/$', chat_views.game_view),
+    url(r'^game/$', chat_views.home),
 ]
