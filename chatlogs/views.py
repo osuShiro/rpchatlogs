@@ -79,7 +79,7 @@ def game_edit(request, name):
             game = chat_models.Game.objects.get(name__iexact=name)
             sessions = chat_models.Session.objects.filter(game=game)
             if request.method=='GET':
-                    return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': 'edit', 'sessions': sessions})
+                return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': 'edit', 'sessions': sessions})
             elif request.method=='POST':
                 keys = request.POST.keys()
                 game.name = request.POST['name'] if 'name' in keys else game.name

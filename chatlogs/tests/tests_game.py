@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from chatlogs import models
+from . import login
 
 
 CLIENT = Client()
@@ -39,3 +40,17 @@ class GameTestCase(TestCase):
     def test_edit_game_not_admin(self):
         CLIENT.login(username='player', password='bla')
         self.assertEqual(CLIENT.get('/game-admin/public game/').status_code, 401)
+
+    def test_edit_game(self):
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/public game/',
+                                            {'name':'edited',
+                                             'gm':'edited',
+                                             'system':'edited',
+                                             },
+                                            HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
+                         200)
+        game_public = models.Game.objects.get(name__iexact='edited')
+        self.assertEqual(game_public.gm, 'edited')
+        self.assertEqual(game_public.system, 'edited')
+
+    #TODO: check if editing a game name properly edits the game's session
