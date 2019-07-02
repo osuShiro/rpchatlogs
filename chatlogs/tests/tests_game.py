@@ -28,20 +28,27 @@ class GameTestCase(TestCase):
     def setUp(self):
         CLIENT_ADMIN.login(username='admin', password='admin')
 
-    def test_view_public_game(self):
+    def test_game_public_view(self):
+        self.assertEqual(CLIENT.get('/game/').status_code, 200)
         self.assertEqual(CLIENT.get('/game/public game/').status_code, 200)
         self.assertEqual(CLIENT.post('/game/public game/').status_code, 405)
         self.assertEqual(CLIENT.patch('/game/public game/').status_code, 405)
         self.assertEqual(CLIENT.delete('/game/public game/').status_code, 405)
 
-    def test_edit_game_logged_out(self):
+    def test_game_admin_logged_out(self):
         self.assertEqual(CLIENT.get('/game-admin/public game/').status_code, 401)
 
-    def test_edit_game_not_admin(self):
+    def test_game_admin_not_admin(self):
         CLIENT.login(username='player', password='bla')
         self.assertEqual(CLIENT.get('/game-admin/public game/').status_code, 401)
 
-    def test_edit_game(self):
+    def test_game_admin_home(self):
+        self.assertEqual(CLIENT_ADMIN.get('/game-admin/').status_code, 200)
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/').status_code, 405)
+        self.assertEqual(CLIENT_ADMIN.patch('/game-admin/').status_code, 405)
+        self.assertEqual(CLIENT_ADMIN.delete('/game-admin/').status_code, 405)
+
+    def test_game_admin_post(self):
         self.assertEqual(CLIENT_ADMIN.post('/game-admin/public game/',
                                             {'name':'edited',
                                              'gm':'edited',
@@ -53,4 +60,67 @@ class GameTestCase(TestCase):
         self.assertEqual(game_public.gm, 'edited')
         self.assertEqual(game_public.system, 'edited')
 
-    #TODO: check if editing a game name properly edits the game's session
+    def test_game_admin_add(self):
+        self.assertEqual(CLIENT.get('/game-admin/add/').status_code, 401)
+        CLIENT.login(username='player', password='bla')
+        self.assertEqual(CLIENT.get('/game-admin/add/').status_code, 401)
+        self.assertEqual(CLIENT_ADMIN.get('/game-admin/add/').status_code, 200)
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/add/').status_code, 405)
+        self.assertEqual(CLIENT_ADMIN.patch('/game-admin/add/').status_code, 405)
+        self.assertEqual(CLIENT_ADMIN.delete('/game-admin/add/').status_code, 405)
+
+    def test_game_admin_post_no_name(self):
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+                                           {
+                                               'gm':'gm',
+                                               'system':'system',
+                                           },
+                                           HTTP_AUTHORIZATION = 'JWT {}'.format(login.login('admin'))).status_code,
+                         401)
+
+    def test_game_admin_post_partial_payload(self):
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+                                           {
+                                               'name':'name',
+                                               'system': 'system',
+                                           },
+                                           HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
+                         201)
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+                                           {
+                                               'name': 'name',
+                                               'gm': 'gm',
+                                           },
+                                           HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
+                         201)
+
+    def test_game_admin_delete_game_not_found(self):
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+                                           {
+                                               'name': 'wrongname',
+                                           },
+                                           HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
+                         403)
+
+    def test_game_admin_delete_multiple_games_found(self):
+        game2 = models.Game(
+            name='public game',
+            gm='gm',
+            system='system',
+        )
+        game2.save()
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+                                           {
+                                               'name': 'public game',
+                                           },
+                                           HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
+                         403)
+
+    def test_game_admin_delete(self):
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+                                           {
+                                               'name': 'public game',
+                                           },
+                                           HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
+                         200)
+        self.assertEqual(models.Game.objects.count(), 0)

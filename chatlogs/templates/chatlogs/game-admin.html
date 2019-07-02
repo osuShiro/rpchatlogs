@@ -11,8 +11,8 @@
     <ul>
         {% for game in game_list %}
         <li>
-            <form action="/game-admin/{{ game.name }}/delete/"
-                  method="post"
+            <form action="/game-admin/{{ game.name }}/"
+                  method="delete"
                   onclick="return confirm('Are you sure? This will also delete all associated chatlogs.')"
                   style="display: inline;">
                 {% csrf_token %}

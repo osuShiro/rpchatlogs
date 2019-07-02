@@ -7,7 +7,7 @@
 <body>
     {% if game %}
         {% if action == "edit" %}
-        <form action="" method="post">
+        <form action="" method="patch">
             {% csrf_token %}
             <p>Name: <input type="text" value="{{ game.name }}" name="name"></p>
             <p>GM: <input type="text" value="{{ game.gm }}" name="gm"></p>

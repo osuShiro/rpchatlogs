@@ -7,7 +7,7 @@
 <body>
     {% if status %}<p>{{ status }}</p>{% endif %}
     <p>Add new session for {{ game.name }}</p>
-    <form action="" method="post">
+    <form action="../" method="post">
         {% csrf_token %}
         Session title: <input type="text" name="title"><br />
         Date will be automatically added based on the chatlog file.<br />
