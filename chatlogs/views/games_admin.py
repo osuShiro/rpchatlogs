@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from chatlogs import models as chat_models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-import json, datetime, re
 
 
 @login_required()
@@ -14,12 +13,18 @@ def games_admin(request, name=None):
         return games_admin_post(request)
     if not name:
         return games_admin_home(request)
+    try:
+        game = chat_models.Game.objects.get(name__iexact=name)
+    except ObjectDoesNotExist:
+        return HttpResponse('Game not found.', status=404)
+    except MultipleObjectsReturned:
+        return HttpResponse('Several games exist for this name.', status=401)
     if request.method == 'GET':
-        return games_admin_get(request, name)
+        return games_admin_get(request, game)
     if request.method == 'PATCH':
-        return games_admin_patch(request, name)
+        return games_admin_patch(request, game)
     if request.method == 'DELETE':
-        return games_admin_delete(request, name)
+        return games_admin_delete(request, game)
 
 
 def games_admin_home(request):
@@ -29,20 +34,12 @@ def games_admin_home(request):
     return render(request, 'chatlogs/game-admin.html', {'game_list': games_list})
 
 
-def games_admin_get(request, name):
-    try:
-        game = chat_models.Game.objects.get(name__iexact=name)
-    except ObjectDoesNotExist:
-        return HttpResponse('Game not found.', status=403)
+def games_admin_get(request, game):
     sessions = chat_models.Session.objects.filter(game=game)
     return render(request, 'chatlogs/game-edit.html', {'game': game, 'action': 'view', 'sessions': sessions})
 
 
-def games_admin_patch(request, name):
-    try:
-        game = chat_models.Game.objects.get(name__iexact=name)
-    except ObjectDoesNotExist:
-        return HttpResponse('Game not found.', status=403)
+def games_admin_patch(request, game):
     sessions = chat_models.Session.objects.filter(game=game)
     keys = request.POST.keys()
     game.name = request.POST['name'] if 'name' in keys else game.name
@@ -66,13 +63,7 @@ def games_admin_post(request):
     games_list = (chat_models.Game.objects.all())
     return render(request, 'chatlogs/game-admin.html', {'game_list': games_list}, status=201)
 
-def games_admin_delete(request, name):
-    try:
-        game = chat_models.Game.objects.get(name__iexact=name)
-    except ObjectDoesNotExist:
-        return HttpResponse('Game not found.', status=403)
-    except MultipleObjectsReturned:
-        return HttpResponse('Multiple games found.', status=403)
+def games_admin_delete(request, game):
     game.delete()
     games = (chat_models.Game.objects.all())
     return render(request, 'chatlogs/game-admin.html', {'game_list': games})
