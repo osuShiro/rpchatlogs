@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 @login_required()
 def sessions_append(request, game_name, session_name):
     if not request.user.is_superuser:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
     if not game_name:
         return HttpResponse('Game not found.', status=404)

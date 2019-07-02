@@ -7,7 +7,7 @@
 <body>
     {% if status %}<p>{{ status }}</p>{% endif %}
     <p>Add new messages for {{ session.title }}</p>
-    <form action="" method="post">
+    <form action="../" method="put">
         {% csrf_token %}
         <textarea rows="25" cols="100" name="chatlog"></textarea><br />
         <input type="hidden" name="session_title" value="{{ session.title }}">

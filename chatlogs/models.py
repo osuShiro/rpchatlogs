@@ -18,10 +18,15 @@ MESSAGE_TYPE = (('g', 'general'),
 def message_type_to_db(message):
     pass
 
+
 class Game(models.Model):
     name = models.CharField(max_length=128, default='')
     gm = models.CharField(max_length=128, default='')
     system = models.CharField(max_length=256, blank=True, default='vanilla')
+
+    def __str__(self):
+        return self.name + ' (' + self.gm + ')'
+
 
 class Session(models.Model):
     title = models.CharField(max_length=256, default='')
@@ -73,9 +78,10 @@ class Session(models.Model):
                 new_message.message_type = 'g'
             new_message.save()
 
+
 class Message(models.Model):
     owner = models.CharField(max_length=128, default='')
-    timestamp = models.DateTimeField(default = None)
+    timestamp = models.DateTimeField(default=None)
     text = models.TextField(default='')
     message_type = models.CharField(max_length=1, choices=MESSAGE_TYPE)
     details = models.TextField(default='')

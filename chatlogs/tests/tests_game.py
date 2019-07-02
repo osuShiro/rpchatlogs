@@ -25,8 +25,10 @@ class GameTestCase(TestCase):
         )
         game_public.save()
 
-    def setUp(self):
         CLIENT_ADMIN.login(username='admin', password='admin')
+
+    def setUp(self):
+        pass
 
     def test_game_public_not_found(self):
         self.assertEqual(CLIENT.get('/game/bla/').status_code, 404)
@@ -39,7 +41,7 @@ class GameTestCase(TestCase):
         self.assertEqual(CLIENT.delete('/game/public game/').status_code, 405)
 
     def test_game_admin_logged_out(self):
-        self.assertEqual(CLIENT.get('/game-admin/public game/').status_code, 401)
+        self.assertEqual(CLIENT.get('/game-admin/public game/').status_code, 302)
 
     def test_game_admin_not_admin(self):
         CLIENT.login(username='player', password='bla')
@@ -52,18 +54,21 @@ class GameTestCase(TestCase):
             system='system',
         )
         game2.save()
-        self.assertEqual(CLIENT_ADMIN.get('/game-admin/',
+        self.assertEqual(CLIENT.get('/game/public game/').status_code, 400)
+        self.assertEqual(CLIENT_ADMIN.get('/game-admin/public game/').status_code, 400)
+        self.assertEqual(CLIENT_ADMIN.patch('/game-admin/public game/',
                                            {
-                                               'name': 'public game',
+                                               'name': 'name',
+                                               'gm': 'gm',
+                                               'system': 'system'
                                            },
                                            HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
-                         403)
+                         400)
+
 
     def test_game_admin_home(self):
         self.assertEqual(CLIENT_ADMIN.get('/game-admin/').status_code, 200)
-        self.assertEqual(CLIENT_ADMIN.post('/game-admin/').status_code, 405)
         self.assertEqual(CLIENT_ADMIN.patch('/game-admin/').status_code, 405)
-        self.assertEqual(CLIENT_ADMIN.delete('/game-admin/').status_code, 405)
 
     def test_game_admin_post(self):
         self.assertEqual(CLIENT_ADMIN.post('/game-admin/public game/',
@@ -72,19 +77,19 @@ class GameTestCase(TestCase):
                                              'system':'edited',
                                              },
                                             HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
-                         200)
+                         201)
         game_public = models.Game.objects.get(name__iexact='edited')
         self.assertEqual(game_public.gm, 'edited')
         self.assertEqual(game_public.system, 'edited')
 
     def test_game_admin_add(self):
-        self.assertEqual(CLIENT.get('/game-admin/add/').status_code, 401)
+        self.assertEqual(CLIENT.get('/game-admin/new/').status_code, 302)
         CLIENT.login(username='player', password='bla')
-        self.assertEqual(CLIENT.get('/game-admin/add/').status_code, 401)
-        self.assertEqual(CLIENT_ADMIN.get('/game-admin/add/').status_code, 200)
-        self.assertEqual(CLIENT_ADMIN.post('/game-admin/add/').status_code, 405)
-        self.assertEqual(CLIENT_ADMIN.patch('/game-admin/add/').status_code, 405)
-        self.assertEqual(CLIENT_ADMIN.delete('/game-admin/add/').status_code, 405)
+        self.assertEqual(CLIENT.get('/game-admin/new/').status_code, 401)
+        self.assertEqual(CLIENT_ADMIN.get('/game-admin/new/').status_code, 200)
+        self.assertEqual(CLIENT_ADMIN.post('/game-admin/new/').status_code, 405)
+        self.assertEqual(CLIENT_ADMIN.patch('/game-admin/new/').status_code, 405)
+        self.assertEqual(CLIENT_ADMIN.delete('/game-admin/new/').status_code, 405)
 
     def test_game_admin_post_no_name(self):
         self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
@@ -93,7 +98,7 @@ class GameTestCase(TestCase):
                                                'system':'system',
                                            },
                                            HTTP_AUTHORIZATION = 'JWT {}'.format(login.login('admin'))).status_code,
-                         403)
+                         400)
 
     def test_game_admin_post_partial_payload(self):
         self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
@@ -105,22 +110,22 @@ class GameTestCase(TestCase):
                          201)
         self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
                                            {
-                                               'name': 'name',
+                                               'name': 'name2',
                                                'gm': 'gm',
                                            },
                                            HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
                          201)
 
     def test_game_admin_delete_game_not_found(self):
-        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+        self.assertEqual(CLIENT_ADMIN.delete('/game-admin/',
                                            {
                                                'name': 'wrongname',
                                            },
                                            HTTP_AUTHORIZATION='JWT {}'.format(login.login('admin'))).status_code,
-                         403)
+                         400)
 
     def test_game_admin_delete(self):
-        self.assertEqual(CLIENT_ADMIN.post('/game-admin/',
+        self.assertEqual(CLIENT_ADMIN.delete('/game-admin/',
                                            {
                                                'name': 'public game',
                                            },
