@@ -43,7 +43,7 @@ def sessions_get(request, game, session):
 
 
 @login_required()
-def sessions_patch(request, game, session):
+def sessions_post(request, game, session):
     messages = chat_models.Message.objects.filter(session=session)
     for message in messages:
         if message.message_type == 't':
@@ -77,31 +77,6 @@ def sessions_patch(request, game, session):
     messages = chat_models.Message.objects.filter(session=session)
     return render(request, 'chatlogs/session-edit.html',
                   {'game': game, 'session': session, 'messages': messages})
-
-
-@login_required()
-def sessions_post(request, game, session):
-    keys = request.POST.keys()
-    if 'action' in keys:
-        return sessions_patch(request, game, session)
-
-    if 'title' not in keys:
-        return HttpResponse('ERROR: title cannot be empty.', status=400)
-    if 'chatlog' not in keys or request.POST['chatlog'] == '':
-        return HttpResponse('No chatlog to add.')
-
-    session = chat_models.Session(title=request.POST['title'], game=game)
-    session.save()
-    try:
-        chatlog = json.loads(request.POST['chatlog'])
-        session.import_chatlog(chatlog)
-        session.save()
-    except:
-        return HttpResponse('Invalid json in the chatlog.', status=400)
-
-    sessions_list = chat_models.Session.objects.filter(game=game)
-    return render(request, 'chatlogs/game-admin.html', {'game': game, 'sessions': sessions_list}, status=201)
-
 
 
 def sessions_put(request, game, session):
