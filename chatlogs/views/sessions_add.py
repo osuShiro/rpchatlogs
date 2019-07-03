@@ -19,5 +19,5 @@ def sessions_add(request, game_name):
         return HttpResponse('Game not found.', status=404)
 
     if request.method == 'GET':
-        return render(request, 'chatlogs/session-add.html', {'game': game, 'session': session})
+        return render(request, 'chatlogs/session-add.html', {'game': game})
     return HttpResponse(status=405)
