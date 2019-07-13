@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from chatlogs import models as chat_models
 from django.contrib.auth.decorators import login_required
@@ -28,8 +28,6 @@ def sessions(request, game_name, session_name=None):
         return HttpResponse(status=401)
     if request.method == 'POST':
         return sessions_post(request, game, session)
-    if request.method == 'PUT':
-        return sessions_put(request, game, session)
     return HttpResponse(status=405)
 
 
@@ -49,6 +47,9 @@ def sessions_post(request, game, session):
         if message.message_type == 't':
             message.attacks = json.loads(message.attacks)
     keys = request.POST.keys()
+
+    if request.POST['action'] == 'append':
+        sessions_append(request, game, session)
 
     # get message ids from checkbox keys
     messages_selected = []
@@ -79,15 +80,13 @@ def sessions_post(request, game, session):
                   {'game': game, 'session': session, 'messages': messages})
 
 
-def sessions_put(request, game, session):
+def sessions_append(request, game, session):
     try:
         chatlog = json.loads(request.POST['chatlog'])
     except:
         return HttpResponse('Invalid json in the chatlog.', status=400)
     session.import_chatlog(chatlog)
     session.save()
-    messages = chat_models.Message.objects.filter(session=session)
-    return render(request, 'chatlogs/session-edit.html', {'game': game, 'session': session, 'messages': messages})
 
 
 def session_patch_delete_selected(messages_selected):
